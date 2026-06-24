@@ -5,6 +5,7 @@ from . import views
 
 v_1_router = routers.DefaultRouter()
 v_1_router.register('posts', views.PostViewSet, basename='posts')
+v_1_router.register('groups', views.GroupViewSet, basename='groups')
 
 
 urlpatterns = [
