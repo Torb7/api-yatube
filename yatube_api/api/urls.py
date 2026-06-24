@@ -6,6 +6,11 @@ from . import views
 v_1_router = routers.DefaultRouter()
 v_1_router.register('posts', views.PostViewSet, basename='posts')
 v_1_router.register('groups', views.GroupViewSet, basename='groups')
+v_1_router.register(
+    r'posts/(?P<post_id>\d+)/comments',
+    views.CommentViewSet,
+    basename='comments',
+)
 
 
 urlpatterns = [
