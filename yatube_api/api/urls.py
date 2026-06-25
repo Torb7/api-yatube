@@ -11,6 +11,7 @@ v_1_router.register(
     views.CommentViewSet,
     basename='comments',
 )
+v_1_router.register('follow', views.FollowViewSet, basename='follow')
 
 
 urlpatterns = [

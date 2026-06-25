@@ -1,15 +1,19 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated,
+)
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from posts.models import Post, Group
+from posts.models import Post, Group, Follow
 from .permissions import IsAuthorOrReadOnly
-from .serializers import PostSerializer, GroupSerializer, CommentSerializer
+from . import serializers
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.select_related('author', 'group')
-    serializer_class = PostSerializer
+    serializer_class = serializers.PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly)
 
     def perform_create(self, serializer):
@@ -18,11 +22,11 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+    serializer_class = serializers.GroupSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    serializer_class = CommentSerializer
+    serializer_class = serializers.CommentSerializer
     lookup_url_kwarg = 'comment_id'
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly)
 
@@ -36,3 +40,18 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         post = self.get_post()
         serializer.save(author=self.request.user, post=post)
+
+
+class FollowViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.FollowSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('following__username',)
+
+    def get_queryset(self):
+        return Follow.objects.select_related('user', 'following').filter(
+            user=self.request.user
+        )
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
