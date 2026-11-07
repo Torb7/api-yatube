@@ -5,8 +5,8 @@ REST API для платформы публикации постов. Польз
 ## Технологии
 
 * Python 3.12
-* Django
-* Django REST Framework
+* Django 5.1
+* Django REST Framework 3.15
 * Djoser
 * JWT-аутентификация
 * SQLite
